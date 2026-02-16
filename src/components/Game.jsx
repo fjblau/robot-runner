@@ -7,7 +7,7 @@ import useSounds from '../hooks/useSounds';
 import './Game.css';
 
 function Game() {
-  const currentLane = useKeyPress();
+  const { currentLane, shouldShake } = useKeyPress();
   const [monsters, setMonsters] = useState([]);
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('notStarted');
@@ -44,15 +44,18 @@ function Game() {
     gameTimeRef.current = 0;
   };
 
-  const spawnMonster = useCallback(() => {
-    const newMonster = {
-      id: Date.now() + Math.random(),
-      lane: Math.floor(Math.random() * 4),
-      position: -10,
-      scored: false,
-      type: Math.random() > 0.5 ? 'bad' : 'good'
-    };
-    setMonsters(prev => [...prev, newMonster]);
+  const spawnMonster = useCallback((count = 1) => {
+    const newMonsters = [];
+    for (let i = 0; i < count; i++) {
+      newMonsters.push({
+        id: Date.now() + Math.random() + i,
+        lane: Math.floor(Math.random() * 4),
+        position: -10 - (i * 15),
+        scored: false,
+        type: Math.random() > 0.5 ? 'bad' : 'good'
+      });
+    }
+    setMonsters(prev => [...prev, ...newMonsters]);
   }, []);
 
   useEffect(() => {
@@ -64,11 +67,12 @@ function Game() {
       gameTimeRef.current += 0.05;
       
       const baseSpawnRate = 1500;
-      const spawnRate = Math.max(400, baseSpawnRate - gameTimeRef.current * 10);
+      const spawnRate = Math.max(300, baseSpawnRate - gameTimeRef.current * 15);
       const now = Date.now();
 
       if (now - lastSpawn >= spawnRate) {
-        spawnMonster();
+        const monstersToSpawn = Math.min(3, Math.floor(1 + gameTimeRef.current / 50));
+        spawnMonster(monstersToSpawn);
         lastSpawn = now;
       }
     }, 50);
@@ -128,7 +132,7 @@ function Game() {
   }, [currentLane, playHit, playAvoid, gameState]);
 
   return (
-    <div className="game-container">
+    <div className={`game-container ${shouldShake ? 'shake' : ''}`}>
       <GameBackground />
       <div className="game-lanes">
         <div className="lane"></div>
