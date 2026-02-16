@@ -10,16 +10,39 @@ function Game() {
   const currentLane = useKeyPress();
   const [monsters, setMonsters] = useState([]);
   const [score, setScore] = useState(0);
+  const [gameState, setGameState] = useState('notStarted');
   const gameTimeRef = useRef(0);
   const prevLaneRef = useRef(currentLane);
   const { playMove, playHit, playAvoid } = useSounds();
 
   useEffect(() => {
-    if (prevLaneRef.current !== currentLane) {
+    if (gameState === 'playing' && prevLaneRef.current !== currentLane) {
       playMove();
       prevLaneRef.current = currentLane;
     }
-  }, [currentLane, playMove]);
+  }, [currentLane, playMove, gameState]);
+
+  const startGame = () => {
+    setGameState('playing');
+    setMonsters([]);
+    setScore(0);
+    gameTimeRef.current = 0;
+  };
+
+  const pauseGame = () => {
+    setGameState('paused');
+  };
+
+  const resumeGame = () => {
+    setGameState('playing');
+  };
+
+  const stopGame = () => {
+    setGameState('notStarted');
+    setMonsters([]);
+    setScore(0);
+    gameTimeRef.current = 0;
+  };
 
   const spawnMonster = useCallback(() => {
     const newMonster = {
@@ -32,6 +55,8 @@ function Game() {
   }, []);
 
   useEffect(() => {
+    if (gameState !== 'playing') return;
+
     let lastSpawn = Date.now();
 
     const gameLoop = setInterval(() => {
@@ -48,9 +73,11 @@ function Game() {
     }, 50);
 
     return () => clearInterval(gameLoop);
-  }, [spawnMonster]);
+  }, [spawnMonster, gameState]);
 
   useEffect(() => {
+    if (gameState !== 'playing') return;
+
     const moveInterval = setInterval(() => {
       setMonsters(prev => {
         const baseSpeed = 2;
@@ -88,7 +115,7 @@ function Game() {
     }, 50);
 
     return () => clearInterval(moveInterval);
-  }, [currentLane, playHit, playAvoid]);
+  }, [currentLane, playHit, playAvoid, gameState]);
 
   return (
     <div className="game-container">
@@ -104,6 +131,38 @@ function Game() {
         <Monster key={monster.id} lane={monster.lane} position={monster.position} />
       ))}
       <div className="score">Score: {score}</div>
+      
+      <div className="game-controls">
+        {gameState === 'notStarted' && (
+          <button className="control-button start-button" onClick={startGame}>Start Game</button>
+        )}
+        {gameState === 'playing' && (
+          <>
+            <button className="control-button pause-button" onClick={pauseGame}>Pause</button>
+            <button className="control-button stop-button" onClick={stopGame}>Stop</button>
+          </>
+        )}
+        {gameState === 'paused' && (
+          <>
+            <button className="control-button resume-button" onClick={resumeGame}>Resume</button>
+            <button className="control-button stop-button" onClick={stopGame}>Stop</button>
+          </>
+        )}
+      </div>
+
+      {gameState === 'paused' && (
+        <div className="pause-overlay">
+          <h2>PAUSED</h2>
+        </div>
+      )}
+
+      {gameState === 'notStarted' && (
+        <div className="start-overlay">
+          <h2>Robot Runner</h2>
+          <p>Use keys 4-5-6-7 to switch lanes</p>
+          <p>Avoid monsters to score points!</p>
+        </div>
+      )}
     </div>
   );
 }
