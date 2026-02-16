@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Robot from './Robot';
 import Monster from './Monster';
 import GameBackground from './GameBackground';
@@ -9,7 +9,7 @@ function Game() {
   const currentLane = useKeyPress();
   const [monsters, setMonsters] = useState([]);
   const [score, setScore] = useState(0);
-  const [gameTime, setGameTime] = useState(0);
+  const gameTimeRef = useRef(0);
 
   const spawnMonster = useCallback(() => {
     const newMonster = {
@@ -22,35 +22,29 @@ function Game() {
   }, []);
 
   useEffect(() => {
-    const timeInterval = setInterval(() => {
-      setGameTime(prev => prev + 0.1);
-    }, 100);
-
-    return () => clearInterval(timeInterval);
-  }, []);
-
-  useEffect(() => {
     let lastSpawn = Date.now();
 
-    const checkSpawn = setInterval(() => {
+    const gameLoop = setInterval(() => {
+      gameTimeRef.current += 0.05;
+      
       const baseSpawnRate = 1500;
-      const spawnRate = Math.max(400, baseSpawnRate - gameTime * 10);
+      const spawnRate = Math.max(400, baseSpawnRate - gameTimeRef.current * 10);
       const now = Date.now();
 
       if (now - lastSpawn >= spawnRate) {
         spawnMonster();
         lastSpawn = now;
       }
-    }, 100);
+    }, 50);
 
-    return () => clearInterval(checkSpawn);
-  }, [spawnMonster, gameTime]);
+    return () => clearInterval(gameLoop);
+  }, [spawnMonster]);
 
   useEffect(() => {
     const moveInterval = setInterval(() => {
       setMonsters(prev => {
         const baseSpeed = 2;
-        const speed = baseSpeed + (gameTime / 10);
+        const speed = baseSpeed + (gameTimeRef.current / 10);
 
         const updated = prev.map(monster => {
           const newPosition = monster.position + speed;
@@ -82,7 +76,7 @@ function Game() {
     }, 50);
 
     return () => clearInterval(moveInterval);
-  }, [currentLane, gameTime]);
+  }, [currentLane]);
 
   return (
     <div className="game-container">
