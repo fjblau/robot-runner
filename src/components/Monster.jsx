@@ -1,6 +1,6 @@
 import './Game.css';
 
-function Monster({ lane, position }) {
+function Monster({ lane, position, type }) {
   const lanePositions = {
     0: '12.5%',
     1: '37.5%',
@@ -16,10 +16,10 @@ function Monster({ lane, position }) {
         top: `${position}%`
       }}
     >
-      <div className="monster-body">
+      <div className={`monster-body ${type === 'good' ? 'monster-good' : 'monster-bad'}`}>
         <div className="monster-eye left-eye"></div>
         <div className="monster-eye right-eye"></div>
-        <div className="monster-mouth"></div>
+        <div className={`monster-mouth ${type === 'good' ? 'mouth-happy' : 'mouth-scary'}`}></div>
       </div>
     </div>
   );

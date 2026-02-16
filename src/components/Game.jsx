@@ -49,7 +49,8 @@ function Game() {
       id: Date.now() + Math.random(),
       lane: Math.floor(Math.random() * 4),
       position: -10,
-      scored: false
+      scored: false,
+      type: Math.random() > 0.5 ? 'bad' : 'good'
     };
     setMonsters(prev => [...prev, newMonster]);
   }, []);
@@ -89,17 +90,26 @@ function Game() {
 
           if (!monster.scored && newPosition >= 70 && newPosition <= 90) {
             if (monster.lane === currentLane) {
-              setScore(s => s - 10);
-              playHit();
+              if (monster.type === 'bad') {
+                setScore(s => s - 10);
+                playHit();
+              } else {
+                setScore(s => s + 10);
+                playAvoid();
+              }
               newScored = true;
             }
           }
 
           if (!monster.scored && newPosition > 90) {
             if (monster.lane !== currentLane || newPosition > 95) {
-              setScore(s => s + 10);
-              playAvoid();
-              newScored = true;
+              if (monster.type === 'bad') {
+                setScore(s => s + 10);
+                playAvoid();
+                newScored = true;
+              } else {
+                newScored = true;
+              }
             }
           }
 
@@ -128,7 +138,7 @@ function Game() {
       </div>
       <Robot lane={currentLane} />
       {monsters.map(monster => (
-        <Monster key={monster.id} lane={monster.lane} position={monster.position} />
+        <Monster key={monster.id} lane={monster.lane} position={monster.position} type={monster.type} />
       ))}
       <div className="score">Score: {score}</div>
       
@@ -160,7 +170,8 @@ function Game() {
         <div className="start-overlay">
           <h2>Robot Runner</h2>
           <p>Use keys 4-5-6-7 to switch lanes</p>
-          <p>Avoid monsters to score points!</p>
+          <p className="instruction-red">🔴 Avoid red monsters: +10 points</p>
+          <p className="instruction-green">🟢 Hit green monsters: +10 points</p>
         </div>
       )}
     </div>
