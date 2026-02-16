@@ -47,7 +47,8 @@ Initialize the React project with Vite and set up the basic structure.
 
 ---
 
-### [ ] Step: Core Game Components
+### [x] Step: Core Game Components
+<!-- chat-id: d1daa1e3-dfb7-4704-b7c7-8d5fdb8bbf37 -->
 
 Implement the main game components and layout structure.
 
