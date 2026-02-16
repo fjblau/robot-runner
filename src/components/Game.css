@@ -185,3 +185,134 @@
     transform: translateY(-10px) rotate(10deg);
   }
 }
+
+.monster {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.monster-body {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+  border-radius: 50%;
+  border: 4px solid #880000;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 4px 8px rgba(255, 255, 255, 0.2);
+  position: relative;
+  animation: monsterBob 0.5s ease-in-out infinite;
+}
+
+@keyframes monsterBob {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.monster-eye {
+  position: absolute;
+  width: 16px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  top: 20px;
+}
+
+.monster-eye::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #000;
+  border-radius: 50%;
+  top: 6px;
+  left: 4px;
+}
+
+.monster-eye.left-eye {
+  left: 18px;
+}
+
+.monster-eye.right-eye {
+  right: 18px;
+}
+
+.monster-mouth {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  border: 3px solid #000;
+  border-top: none;
+  border-radius: 0 0 40px 40px;
+  background: #000;
+}
+
+.score {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  font-size: 2em;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #5ac8fa 0%, #007aff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  z-index: 100;
+}
+
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 60px 80px;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 1000;
+  border: 4px solid #5ac8fa;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.game-over h2 {
+  margin: 0 0 20px 0;
+  font-size: 3em;
+  color: #ff4444;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.game-over p {
+  font-size: 1.8em;
+  margin: 20px 0 30px 0;
+  color: #fff;
+}
+
+.game-over button {
+  font-size: 1.5em;
+  padding: 15px 40px;
+  background: linear-gradient(135deg, #5ac8fa 0%, #007aff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-over button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.7);
+}
+
+.game-over button:active {
+  transform: translateY(0);
+}
