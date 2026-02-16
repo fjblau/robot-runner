@@ -8,62 +8,60 @@ import './Game.css';
 function Game() {
   const currentLane = useKeyPress();
   const [monsters, setMonsters] = useState([]);
-  const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
 
   const spawnMonster = useCallback(() => {
-    if (gameOver) return;
-    
     const newMonster = {
       id: Date.now(),
       lane: Math.floor(Math.random() * 4),
-      position: -10
+      position: -10,
+      scored: false
     };
     setMonsters(prev => [...prev, newMonster]);
-  }, [gameOver]);
+  }, []);
 
   useEffect(() => {
-    if (gameOver) return;
-
     const spawnInterval = setInterval(() => {
       spawnMonster();
     }, 1500);
 
     return () => clearInterval(spawnInterval);
-  }, [spawnMonster, gameOver]);
+  }, [spawnMonster]);
 
   useEffect(() => {
-    if (gameOver) return;
-
     const moveInterval = setInterval(() => {
       setMonsters(prev => {
-        const updated = prev.map(monster => ({
-          ...monster,
-          position: monster.position + 2
-        }));
+        const updated = prev.map(monster => {
+          const newPosition = monster.position + 2;
+          let newScored = monster.scored;
 
-        const inBounds = updated.filter(monster => monster.position < 110);
-
-        inBounds.forEach(monster => {
-          if (monster.position >= 70 && monster.position <= 90 && monster.lane === currentLane) {
-            setGameOver(true);
+          if (!monster.scored && newPosition >= 70 && newPosition <= 90) {
+            if (monster.lane === currentLane) {
+              setScore(s => s - 10);
+              newScored = true;
+            }
           }
+
+          if (!monster.scored && newPosition > 90) {
+            if (monster.lane !== currentLane || newPosition > 95) {
+              setScore(s => s + 10);
+              newScored = true;
+            }
+          }
+
+          return {
+            ...monster,
+            position: newPosition,
+            scored: newScored
+          };
         });
 
-        return inBounds;
+        return updated.filter(monster => monster.position < 110);
       });
-
-      setScore(prev => prev + 1);
     }, 50);
 
     return () => clearInterval(moveInterval);
-  }, [currentLane, gameOver]);
-
-  const restartGame = () => {
-    setMonsters([]);
-    setGameOver(false);
-    setScore(0);
-  };
+  }, [currentLane]);
 
   return (
     <div className="game-container">
@@ -79,13 +77,6 @@ function Game() {
         <Monster key={monster.id} lane={monster.lane} position={monster.position} />
       ))}
       <div className="score">Score: {score}</div>
-      {gameOver && (
-        <div className="game-over">
-          <h2>Game Over!</h2>
-          <p>Final Score: {score}</p>
-          <button onClick={restartGame}>Restart</button>
-        </div>
-      )}
     </div>
   );
 }
