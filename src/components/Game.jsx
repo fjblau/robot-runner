@@ -3,6 +3,7 @@ import Robot from './Robot';
 import Monster from './Monster';
 import GameBackground from './GameBackground';
 import useKeyPress from '../hooks/useKeyPress';
+import useSounds from '../hooks/useSounds';
 import './Game.css';
 
 function Game() {
@@ -10,6 +11,15 @@ function Game() {
   const [monsters, setMonsters] = useState([]);
   const [score, setScore] = useState(0);
   const gameTimeRef = useRef(0);
+  const prevLaneRef = useRef(currentLane);
+  const { playMove, playHit, playAvoid } = useSounds();
+
+  useEffect(() => {
+    if (prevLaneRef.current !== currentLane) {
+      playMove();
+      prevLaneRef.current = currentLane;
+    }
+  }, [currentLane, playMove]);
 
   const spawnMonster = useCallback(() => {
     const newMonster = {
@@ -53,6 +63,7 @@ function Game() {
           if (!monster.scored && newPosition >= 70 && newPosition <= 90) {
             if (monster.lane === currentLane) {
               setScore(s => s - 10);
+              playHit();
               newScored = true;
             }
           }
@@ -60,6 +71,7 @@ function Game() {
           if (!monster.scored && newPosition > 90) {
             if (monster.lane !== currentLane || newPosition > 95) {
               setScore(s => s + 10);
+              playAvoid();
               newScored = true;
             }
           }
@@ -76,7 +88,7 @@ function Game() {
     }, 50);
 
     return () => clearInterval(moveInterval);
-  }, [currentLane]);
+  }, [currentLane, playHit, playAvoid]);
 
   return (
     <div className="game-container">
