@@ -14,6 +14,8 @@ function Game() {
   const [timeLeft, setTimeLeft] = useState(120);
   const [playerName, setPlayerName] = useState('');
   const [highScores, setHighScores] = useState([]);
+  const [likes, setLikes] = useState({ thumbsUp: 0, thumbsDown: 0 });
+  const [userVote, setUserVote] = useState(null);
   const gameTimeRef = useRef(0);
   const prevLaneRef = useRef(currentLane);
   const { playMove, playHit, playAvoid } = useSounds();
@@ -22,6 +24,16 @@ function Game() {
     const saved = localStorage.getItem('robotRunnerHighScores');
     if (saved) {
       setHighScores(JSON.parse(saved));
+    }
+    
+    const savedLikes = localStorage.getItem('robotRunnerLikes');
+    if (savedLikes) {
+      setLikes(JSON.parse(savedLikes));
+    }
+    
+    const savedVote = localStorage.getItem('robotRunnerUserVote');
+    if (savedVote) {
+      setUserVote(savedVote);
     }
   }, []);
 
@@ -74,6 +86,26 @@ function Game() {
     setGameState('viewHighScores');
   };
 
+  const handleVote = (voteType) => {
+    if (userVote === voteType) {
+      return;
+    }
+
+    const newLikes = { ...likes };
+    
+    if (userVote) {
+      newLikes[userVote === 'up' ? 'thumbsUp' : 'thumbsDown']--;
+    }
+    
+    newLikes[voteType === 'up' ? 'thumbsUp' : 'thumbsDown']++;
+    
+    setLikes(newLikes);
+    setUserVote(voteType);
+    
+    localStorage.setItem('robotRunnerLikes', JSON.stringify(newLikes));
+    localStorage.setItem('robotRunnerUserVote', voteType);
+  };
+
   const spawnMonster = useCallback((count = 1) => {
     const newMonsters = [];
     for (let i = 0; i < count; i++) {
@@ -113,11 +145,11 @@ function Game() {
       gameTimeRef.current += 0.05;
       
       const baseSpawnRate = 1500;
-      const spawnRate = Math.max(300, baseSpawnRate - gameTimeRef.current * 15);
+      const spawnRate = Math.max(600, baseSpawnRate - gameTimeRef.current * 8);
       const now = Date.now();
 
       if (now - lastSpawn >= spawnRate) {
-        const monstersToSpawn = Math.min(3, Math.floor(1 + gameTimeRef.current / 50));
+        const monstersToSpawn = Math.min(2, Math.floor(1 + gameTimeRef.current / 80));
         spawnMonster(monstersToSpawn);
         lastSpawn = now;
       }
@@ -132,7 +164,7 @@ function Game() {
     const moveInterval = setInterval(() => {
       setMonsters(prev => {
         const baseSpeed = 2;
-        const speed = baseSpeed + (gameTimeRef.current / 10);
+        const speed = baseSpeed + (gameTimeRef.current / 20);
 
         const updated = prev.map(monster => {
           const newPosition = monster.position + speed;
@@ -235,6 +267,26 @@ function Game() {
           <p className="instruction-red">🔴 Avoid red monsters: +10 points</p>
           <p className="instruction-green">🟢 Hit green monsters: +10 points</p>
           <p className="game-duration">Game Duration: 2 minutes</p>
+          
+          <div className="vote-section">
+            <p className="vote-prompt">Rate this game:</p>
+            <div className="vote-buttons">
+              <button 
+                className={`vote-button thumbs-up ${userVote === 'up' ? 'active' : ''}`}
+                onClick={() => handleVote('up')}
+                title="Like"
+              >
+                👍 <span className="vote-count">{likes.thumbsUp}</span>
+              </button>
+              <button 
+                className={`vote-button thumbs-down ${userVote === 'down' ? 'active' : ''}`}
+                onClick={() => handleVote('down')}
+                title="Dislike"
+              >
+                👎 <span className="vote-count">{likes.thumbsDown}</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -272,6 +324,26 @@ function Game() {
                 </div>
               ))
             )}
+          </div>
+          
+          <div className="vote-section">
+            <p className="vote-prompt">Rate this game:</p>
+            <div className="vote-buttons">
+              <button 
+                className={`vote-button thumbs-up ${userVote === 'up' ? 'active' : ''}`}
+                onClick={() => handleVote('up')}
+                title="Like"
+              >
+                👍 <span className="vote-count">{likes.thumbsUp}</span>
+              </button>
+              <button 
+                className={`vote-button thumbs-down ${userVote === 'down' ? 'active' : ''}`}
+                onClick={() => handleVote('down')}
+                title="Dislike"
+              >
+                👎 <span className="vote-count">{likes.thumbsDown}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
