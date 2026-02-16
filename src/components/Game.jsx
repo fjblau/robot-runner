@@ -9,10 +9,11 @@ function Game() {
   const currentLane = useKeyPress();
   const [monsters, setMonsters] = useState([]);
   const [score, setScore] = useState(0);
+  const [gameTime, setGameTime] = useState(0);
 
   const spawnMonster = useCallback(() => {
     const newMonster = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       lane: Math.floor(Math.random() * 4),
       position: -10,
       scored: false
@@ -21,18 +22,32 @@ function Game() {
   }, []);
 
   useEffect(() => {
+    const timeInterval = setInterval(() => {
+      setGameTime(prev => prev + 0.1);
+    }, 100);
+
+    return () => clearInterval(timeInterval);
+  }, []);
+
+  useEffect(() => {
+    const baseSpawnRate = 1500;
+    const spawnRate = Math.max(400, baseSpawnRate - gameTime * 10);
+
     const spawnInterval = setInterval(() => {
       spawnMonster();
-    }, 1500);
+    }, spawnRate);
 
     return () => clearInterval(spawnInterval);
-  }, [spawnMonster]);
+  }, [spawnMonster, gameTime]);
 
   useEffect(() => {
     const moveInterval = setInterval(() => {
       setMonsters(prev => {
+        const baseSpeed = 2;
+        const speed = baseSpeed + (gameTime / 10);
+
         const updated = prev.map(monster => {
-          const newPosition = monster.position + 2;
+          const newPosition = monster.position + speed;
           let newScored = monster.scored;
 
           if (!monster.scored && newPosition >= 70 && newPosition <= 90) {
@@ -61,7 +76,7 @@ function Game() {
     }, 50);
 
     return () => clearInterval(moveInterval);
-  }, [currentLane]);
+  }, [currentLane, gameTime]);
 
   return (
     <div className="game-container">

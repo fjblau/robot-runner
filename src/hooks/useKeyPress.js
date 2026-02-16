@@ -5,13 +5,13 @@ function useKeyPress() {
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      const key = event.key.toLowerCase();
+      const key = event.key;
       
       const keyToLane = {
-        'a': 0,
-        's': 1,
-        'd': 2,
-        'f': 3
+        '4': 0,
+        '5': 1,
+        '6': 2,
+        '7': 3
       };
 
       if (key in keyToLane) {
