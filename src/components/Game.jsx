@@ -30,14 +30,20 @@ function Game() {
   }, []);
 
   useEffect(() => {
-    const baseSpawnRate = 1500;
-    const spawnRate = Math.max(400, baseSpawnRate - gameTime * 10);
+    let lastSpawn = Date.now();
 
-    const spawnInterval = setInterval(() => {
-      spawnMonster();
-    }, spawnRate);
+    const checkSpawn = setInterval(() => {
+      const baseSpawnRate = 1500;
+      const spawnRate = Math.max(400, baseSpawnRate - gameTime * 10);
+      const now = Date.now();
 
-    return () => clearInterval(spawnInterval);
+      if (now - lastSpawn >= spawnRate) {
+        spawnMonster();
+        lastSpawn = now;
+      }
+    }, 100);
+
+    return () => clearInterval(checkSpawn);
   }, [spawnMonster, gameTime]);
 
   useEffect(() => {
