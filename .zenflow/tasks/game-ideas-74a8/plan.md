@@ -67,7 +67,8 @@ Implement the main game components and layout structure.
 
 ---
 
-### [ ] Step: Keyboard Input & Animation
+### [x] Step: Keyboard Input & Animation
+<!-- chat-id: 554a11df-3b09-426f-961f-748a8f1ed7f0 -->
 
 Add keyboard controls and running animations.
 

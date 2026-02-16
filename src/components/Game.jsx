@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import Robot from './Robot';
 import GameBackground from './GameBackground';
+import useKeyPress from '../hooks/useKeyPress';
 import './Game.css';
 
 function Game() {
-  const [currentLane, setCurrentLane] = useState(1);
+  const currentLane = useKeyPress();
 
   return (
     <div className="game-container">

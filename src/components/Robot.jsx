@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import './Game.css';
 
 function Robot({ lane }) {
@@ -25,9 +24,5 @@ function Robot({ lane }) {
     </div>
   );
 }
-
-Robot.propTypes = {
-  lane: PropTypes.number.isRequired
-};
 
 export default Robot;

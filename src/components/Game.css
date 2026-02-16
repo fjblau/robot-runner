@@ -110,3 +110,29 @@
   border-radius: 2px;
   border: 2px solid #3a7ed8;
 }
+
+.robot-leg.left {
+  animation: runLeft 0.4s ease-in-out infinite;
+}
+
+.robot-leg.right {
+  animation: runRight 0.4s ease-in-out infinite;
+}
+
+@keyframes runLeft {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-10deg);
+  }
+}
+
+@keyframes runRight {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(10deg);
+  }
+}
