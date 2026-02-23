@@ -114,7 +114,7 @@ function Game() {
         lane: Math.floor(Math.random() * 4),
         position: -10 - (i * 15),
         scored: false,
-        type: Math.random() > 0.5 ? 'bad' : 'good'
+        type: (() => { const r = Math.random(); return r > 0.6 ? 'bad' : r > 0.2 ? 'good' : 'blue'; })()
       });
     }
     setMonsters(prev => [...prev, ...newMonsters]);
@@ -175,6 +175,9 @@ function Game() {
               if (monster.type === 'bad') {
                 setScore(s => Math.max(0, s - 10));
                 playHit();
+              } else if (monster.type === 'blue') {
+                setScore(s => s + 15);
+                playAvoid();
               } else {
                 setScore(s => s + 10);
                 playAvoid();
@@ -266,6 +269,7 @@ function Game() {
           <p>Use keys 4-5-6-7 to switch lanes</p>
           <p className="instruction-red">🔴 Avoid red monsters: +10 points</p>
           <p className="instruction-green">🟢 Hit green monsters: +10 points</p>
+          <p className="instruction-blue">🔵 Catch blue monsters with arms: +15 points</p>
           <p className="game-duration">Game Duration: 2 minutes</p>
           
           <div className="vote-section">

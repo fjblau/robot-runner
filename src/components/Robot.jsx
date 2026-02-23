@@ -15,7 +15,11 @@ function Robot({ lane }) {
     >
       <div className="robot-body">
         <div className="robot-head"></div>
-        <div className="robot-torso"></div>
+        <div className="robot-torso-wrapper">
+          <div className="robot-arm left"></div>
+          <div className="robot-torso"></div>
+          <div className="robot-arm right"></div>
+        </div>
         <div className="robot-legs">
           <div className="robot-leg left"></div>
           <div className="robot-leg right"></div>

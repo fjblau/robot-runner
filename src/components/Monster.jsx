@@ -16,10 +16,10 @@ function Monster({ lane, position, type }) {
         top: `${position}%`
       }}
     >
-      <div className={`monster-body ${type === 'good' ? 'monster-good' : 'monster-bad'}`}>
+      <div className={`monster-body ${type === 'good' ? 'monster-good' : type === 'blue' ? 'monster-blue' : 'monster-bad'}`}>
         <div className="monster-eye left-eye"></div>
         <div className="monster-eye right-eye"></div>
-        <div className={`monster-mouth ${type === 'good' ? 'mouth-happy' : 'mouth-scary'}`}></div>
+        <div className={`monster-mouth ${type === 'good' || type === 'blue' ? 'mouth-happy' : 'mouth-scary'}`}></div>
       </div>
     </div>
   );
