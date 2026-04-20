@@ -21,11 +21,14 @@ function Game() {
   const { playMove, playHit, playAvoid } = useSounds();
 
   useEffect(() => {
-    const saved = localStorage.getItem('robotRunnerHighScores');
-    if (saved) {
-      setHighScores(JSON.parse(saved));
-    }
-    
+    fetch('/api/highscores')
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => setHighScores(data))
+      .catch(() => {
+        const saved = localStorage.getItem('robotRunnerHighScores');
+        if (saved) setHighScores(JSON.parse(saved));
+      });
+
     const savedLikes = localStorage.getItem('robotRunnerLikes');
     if (savedLikes) {
       setLikes(JSON.parse(savedLikes));
@@ -70,19 +73,25 @@ function Game() {
 
   const saveHighScore = () => {
     if (!playerName.trim()) return;
-    
-    const newScore = {
-      name: playerName.trim(),
-      score: score,
-      date: new Date().toISOString()
-    };
-    
-    const updated = [...highScores, newScore]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10);
-    
-    setHighScores(updated);
-    localStorage.setItem('robotRunnerHighScores', JSON.stringify(updated));
+
+    const name = playerName.trim();
+    fetch('/api/highscores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, score }),
+    })
+      .then(r => r.ok ? fetch('/api/highscores') : Promise.reject())
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => setHighScores(data))
+      .catch(() => {
+        const newScore = { name, score, date: new Date().toISOString() };
+        const updated = [...highScores, newScore]
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 10);
+        setHighScores(updated);
+        localStorage.setItem('robotRunnerHighScores', JSON.stringify(updated));
+      });
+
     setGameState('viewHighScores');
   };
 
